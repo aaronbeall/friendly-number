@@ -1,16 +1,49 @@
 # friendly-numbers
 
-A TypeScript library for creating, converting, and formatting friendly "clean" numbers. Perfect for displaying numbers in user interfaces with intelligent rounding, formatting, and scaling.
+A TypeScript library that makes number formatting effortless with intelligent defaults. Built on `Intl.NumberFormat`, it provides automatic decimal handling, unified formatting options, and tools for generating human-friendly number scales—perfect for UIs, charts, and data visualization.
 
-## Features
+## What It Does
 
-- 🎯 **Significant Digits**: Detect and round to significant digits
-- 🔄 **Smart Scaling**: Convert numbers with intelligent precision preservation
-- 📊 **Friendly Formatting**: Format numbers with sensible defaults using `Intl.NumberFormat`
-- 📈 **Scale Generation**: Create linear, exponential, or friendly number scales
-- 🌍 **Internationalization**: Built on `Intl.NumberFormat` for locale support
-- 💰 **Currency & Units**: Easy formatting for currency, units, and deltas
-- 📏 **Range Formatting**: Format number ranges with `formatRange`
+This library provides a convenience layer over `Intl.NumberFormat` with opinionated defaults for common use cases:
+
+**Automatic decimal adjustment** based on number magnitude:
+```typescript
+formatFriendlyNumber(1234.56);  // "1,235" (0 decimals)
+formatFriendlyNumber(12.34);    // "12.3"  (1 decimal)
+formatFriendlyNumber(1.234);    // "1.23" (2 decimals)
+```
+
+**Simplified API** - single `display` option instead of multiple Intl options:
+```typescript
+formatFriendlyNumber(1234567, { currency: 'USD', display: 'short' }); // "$1.23M"
+
+// Equivalent Intl.NumberFormat:
+new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  notation: 'compact',
+  compactDisplay: 'short',
+  currencyDisplay: 'narrowSymbol',
+  maximumFractionDigits: 2
+}).format(1234567);
+```
+
+**Scientific notation** for very small numbers with compact display:
+```typescript
+formatFriendlyNumber(0.00012, { display: 'short' }); // "1.2E-4"
+```
+
+**Significant digit preservation** when scaling numbers:
+```typescript
+scaleNumber(7, 365.25);  // 3000 (preserves 1 sig digit from 7)
+scaleNumber(2.5, 16);    // 40 (preserves 2 sig digits from 2.5)
+```
+
+**Human-friendly scale generation** for charts and axes:
+```typescript
+generateScale(100, 1_000_000);
+// [100, 200, 500, 1000, 2000, 5000, 10000, 25000, 50000, ...]
+```
 
 ## Installation
 
