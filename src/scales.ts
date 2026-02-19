@@ -102,17 +102,11 @@ export function generateScale(
       scale.push(applyRounding(end, rounding, significantDigits));
     }
   } else {
-    const logStart = Math.log10(start);
-    const logEnd = Math.log10(end);
-    const range = logEnd - logStart;
-    
     if (includeStart) {
       scale.push(roundToFriendlyNumber(start));
     }
     
     let current = start;
-    const friendlyMultipliers = [2, 2.5, 2, 2.5, 2];
-    let multiplierIndex = 0;
     
     while (current < end) {
       const magnitude = Math.floor(Math.log10(current));
