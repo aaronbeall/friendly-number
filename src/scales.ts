@@ -70,7 +70,9 @@ export function generateScale(
   const scale: number[] = [];
   
   if (progression === 'linear') {
-    const step = (end - start) / (steps + 1);
+    // Calculate step size based on whether we include start/end
+    const numIntervals = includeStart && includeEnd ? steps + 1 : steps;
+    const step = (end - start) / numIntervals;
     
     if (includeStart) {
       scale.push(applyRounding(start, rounding, significantDigits));
@@ -87,7 +89,9 @@ export function generateScale(
   } else if (progression === 'exponential') {
     const logStart = Math.log10(start);
     const logEnd = Math.log10(end);
-    const logStep = (logEnd - logStart) / (steps + 1);
+    // Calculate step size based on whether we include start/end
+    const numIntervals = includeStart && includeEnd ? steps + 1 : steps;
+    const logStep = (logEnd - logStart) / numIntervals;
     
     if (includeStart) {
       scale.push(applyRounding(start, rounding, significantDigits));
