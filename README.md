@@ -145,6 +145,10 @@ formatFriendlyNumber(1.234);    // "1.23"
 formatFriendlyNumber(1234567, { display: 'short' });   // "1.2M"
 formatFriendlyNumber(1234567, { display: 'long' }); // "1.2 million"
 
+// Scientific notation for very small numbers (0 < |n| < 1)
+formatFriendlyNumber(0.00012, { display: 'short' }); // "1.2E-4"
+formatFriendlyNumber(0.00012, { display: 'standard' }); // "0.00012"
+
 // Currency
 formatFriendlyNumber(1234.56, { currency: 'USD' }); // "$1,234.56"
 formatFriendlyNumber(1234567, { currency: 'USD', display: 'short' }); // "$1.2M"
@@ -192,7 +196,7 @@ formatFriendlyNumber(1234.5678, {
 - `locale`: Locale string(s) for formatting (default: `'en-US'`)
 - `display`: Unified display style - `'standard' | 'short' | 'long'`
   - `'standard'`: Standard notation (1,234) - for currency: symbol ($)
-  - `'short'`: Compact notation with short display (1.2M) - for currency: narrow symbol ($), for units: short (km/h)
+  - `'short'`: Compact notation with short display (1.2M), scientific notation for very small numbers (1.2E-4) - for currency: narrow symbol ($), for units: short (km/h)
   - `'long'`: Compact notation with long display (1.2 million) - for currency: full name (US dollars), for units: long (kilometers per hour)
 - `sign`: Show sign for positive/negative numbers - `boolean` (default: `false`, `true` = exceptZero)
 - `currency`: Currency code (e.g., `'USD'`, `'EUR'`)

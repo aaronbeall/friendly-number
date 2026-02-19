@@ -40,6 +40,21 @@ describe('formatFriendlyNumber', () => {
       const result = formatFriendlyNumber(1234567, { display: 'long' });
       expect(result).toContain('million');
     });
+
+    it('should use scientific notation for small numbers with short display', () => {
+      const result = formatFriendlyNumber(0.00012, { display: 'short' });
+      expect(result).toMatch(/1\.2E-4/i);
+    });
+
+    it('should use standard notation for small numbers without short display', () => {
+      const result = formatFriendlyNumber(0.00012, { display: 'standard' });
+      expect(result).toBe('0.00012');
+    });
+
+    it('should not use scientific notation for small currency values', () => {
+      const result = formatFriendlyNumber(0.01, { currency: 'USD', display: 'short' });
+      expect(result).toMatch(/\$0\.01/);
+    });
   });
 
   describe('sign display', () => {

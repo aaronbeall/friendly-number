@@ -4,6 +4,7 @@ import { roundToSignificantDigits } from './significant-digits.js';
  * Display style for formatting numbers.
  *
  * For plain numbers (no currency/unit/percent), 'short' and 'long' enable compact notation.
+ * For very small numbers (0 < |n| < 1), 'short' uses scientific notation.
  * For currency/unit, they also enable compact notation with appropriate display styles.
  *
  * @example
@@ -11,6 +12,10 @@ import { roundToSignificantDigits } from './significant-digits.js';
  * display: 'standard' → "1,234"
  * display: 'short'    → "1.2K" (compact notation, short display)
  * display: 'long'     → "1.2 thousand" (compact notation, long display)
+ *
+ * // Small numbers (0 < |n| < 1)
+ * display: 'standard' → "0.00012"
+ * display: 'short'    → "1.2E-4" (scientific notation)
  *
  * // With currency
  * currency: 'USD', display: 'standard' → "$1,234.00" (symbol)
@@ -92,9 +97,10 @@ function resolveDisplayOptions(
   currency: string | undefined,
   unit: string | undefined,
   code: boolean,
-  accounting: boolean
+  accounting: boolean,
+  value?: number
 ): {
-  notation: 'standard' | 'compact';
+  notation: 'standard' | 'compact' | 'scientific';
   currencyDisplay?: 'symbol' | 'narrowSymbol' | 'code' | 'name';
   unitDisplay?: 'short' | 'long' | 'narrow';
   compactDisplay?: 'short' | 'long';
@@ -108,8 +114,19 @@ function resolveDisplayOptions(
   // For currency/unit, 'short' and 'long' also enable compact notation
   const isCompact = display === 'short' || display === 'long';
   if (isCompact) {
-    result.notation = 'compact';
-    result.compactDisplay = display === 'long' ? 'long' : 'short';
+    // Use scientific notation for very small numbers with 'short' display
+    if (display === 'short' && value !== undefined && !currency && !unit) {
+      const absValue = Math.abs(value);
+      if (absValue > 0 && absValue < 1) {
+        result.notation = 'scientific';
+      } else {
+        result.notation = 'compact';
+        result.compactDisplay = 'short';
+      }
+    } else {
+      result.notation = 'compact';
+      result.compactDisplay = display === 'long' ? 'long' : 'short';
+    }
   }
 
   if (currency) {
@@ -171,12 +188,13 @@ export function formatFriendlyNumber(
   } = options;
 
   const isRange = Array.isArray(value);
+  const singleValue = isRange ? value[0] : value;
 
   // Start with custom format if provided, otherwise build from scratch
   const formatOptions: Intl.NumberFormatOptions = format ? { ...format } : {};
 
   // Resolve display options (includes notation)
-  const displayOptions = resolveDisplayOptions(display, currency, unit, code, accounting);
+  const displayOptions = resolveDisplayOptions(display, currency, unit, code, accounting, singleValue);
   const isCompact = displayOptions.notation === 'compact';
 
   // Set notation
