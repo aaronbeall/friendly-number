@@ -1,48 +1,85 @@
 # friendly-numbers
 
-A TypeScript library that makes number formatting effortless with intelligent defaults. Built on `Intl.NumberFormat`, it provides automatic decimal handling, unified formatting options, and tools for generating human-friendly number scales—perfect for UIs, charts, and data visualization.
+A TypeScript library for displaying and generating "friendly" numbers in UI. Built on `Intl.NumberFormat`, it provides automatic decimal handling, unified formatting options, and tools for generating human-friendly numbers and scales—e.g. for clean UI interpolation from user input, chart axes tick marks, or data visualization.
 
 ## What It Does
 
-This library provides a convenience layer over `Intl.NumberFormat` with opinionated defaults for common use cases:
+This library provides a convenience layer over `Intl.NumberFormat` with opinionated, sensible defaults for common use cases:
 
-**Automatic decimal adjustment** based on number magnitude:
+### 1. Intelligent Decimal Handling
+
+**Problem:** Raw `Intl.NumberFormat` requires you to manually specify decimal places for every number, leading to either:
+- Too many decimals for large numbers: `1234.00` instead of `1,234`
+- Too few decimals for small numbers: `0` instead of `0.12`
+
+**Solution:** Auto decimals that adjust based on magnitude:
+
 ```typescript
-formatFriendlyNumber(1234.56);  // "1,235" (0 decimals)
+// With this library (auto decimals)
+formatFriendlyNumber(1234.56);  // "1,235" (0 decimals for large numbers)
 formatFriendlyNumber(12.34);    // "12.3"  (1 decimal)
 formatFriendlyNumber(1.234);    // "1.23" (2 decimals)
+
+// With raw Intl.NumberFormat - you'd need different configs for each
+new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(1234.56); // "1,235"
+new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(12.34);   // "12.3"
 ```
 
-**Simplified API** - single `display` option instead of multiple Intl options:
+### 2. Unified API for Common Formatting Patterns
+
+**Problem:** `Intl.NumberFormat` has many granular options that are confusing to combine:
+
+- `notation`, `compactDisplay`, `currencyDisplay`, `unitDisplay`, `signDisplay`, etc.
+
+**Solution:** Single intuitive `display` option that maps sensibly:
+
 ```typescript
+// This library - simple and intuitive
 formatFriendlyNumber(1234567, { currency: 'USD', display: 'short' }); // "$1.23M"
 
-// Equivalent Intl.NumberFormat:
+// Raw Intl - verbose and error-prone
 new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
   notation: 'compact',
   compactDisplay: 'short',
   currencyDisplay: 'narrowSymbol',
+  minimumFractionDigits: 0,
   maximumFractionDigits: 2
 }).format(1234567);
 ```
 
-**Scientific notation** for very small numbers with compact display:
+### 3. Scientific Notation for Very Small Numbers
+
+**Problem:** Compact notation doesn't work for numbers < 1, leaving you with ugly decimals like `0.00012`
+
+**Solution:** Automatic scientific notation for small numbers with `display: 'short'`:
+
 ```typescript
 formatFriendlyNumber(0.00012, { display: 'short' }); // "1.2E-4"
 ```
 
-**Significant digit preservation** when scaling numbers:
+### 4. Significant Digits Preservation in Scaling
+
+**Problem:** When converting units (days→years, meters→km), you lose precision context
+
+**Solution:** Intelligent significant digit preservation:
+
 ```typescript
 scaleNumber(7, 365.25);  // 3000 (preserves 1 sig digit from 7)
 scaleNumber(2.5, 16);    // 40 (preserves 2 sig digits from 2.5)
 ```
 
-**Human-friendly scale generation** for charts and axes:
+### 5. Friendly Scale Generation
+
+**Problem:** Creating chart axes or slider ticks requires manual calculation of "nice" numbers
+
+**Solution:** Automatic generation of human-friendly scales:
+
 ```typescript
 generateScale(100, 1_000_000);
-// [100, 200, 500, 1000, 2000, 5000, 10000, 25000, 50000, ...]
+// [100, 200, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000, 200000, 500000, 1000000]
+// All "round" numbers that humans expect
 ```
 
 ## Installation
