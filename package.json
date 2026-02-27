@@ -1,6 +1,6 @@
 {
   "name": "friendly-number",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A TypeScript library for creating, converting, and formatting friendly 'clean' numbers",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
