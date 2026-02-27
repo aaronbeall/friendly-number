@@ -9,8 +9,8 @@ This library provides a convenience layer over `Intl.NumberFormat` with opiniona
 ### 1. Intelligent Decimal Handling
 
 **Problem:** Raw `Intl.NumberFormat` requires you to manually specify decimal places for every number, leading to either:
-- Too many decimals for large numbers: `1234.00` instead of `1,234`
-- Too few decimals for small numbers: `0` instead of `0.12`
+- Too many decimals for large numbers: `1,234.123` instead of `1,234`
+- Too few decimals for small numbers: `0` instead of `0.123`
 
 **Solution:** Auto decimals that adjust based on magnitude:
 
@@ -19,6 +19,7 @@ This library provides a convenience layer over `Intl.NumberFormat` with opiniona
 formatFriendlyNumber(1234.56);  // "1,235" (0 decimals for large numbers)
 formatFriendlyNumber(12.34);    // "12.3"  (1 decimal)
 formatFriendlyNumber(1.234);    // "1.23" (2 decimals)
+formatFriendlyNumber(0.00123);   // "0.0012" (4 decimals)
 
 // With raw Intl.NumberFormat - you'd need different configs for each
 new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(1234.56); // "1,235"
@@ -230,6 +231,10 @@ formatFriendlyNumber(42, { sign: true });  // "+42"
 formatFriendlyNumber(-42, { sign: true }); // "-42"
 formatFriendlyNumber(0, { sign: true });   // "0"
 
+// Absolute value (hide sign)
+formatFriendlyNumber(-42, { absolute: true }); // "42"
+formatFriendlyNumber(-1234, { currency: 'USD', absolute: true }); // "$1,234"
+
 // Units
 formatFriendlyNumber(50, { unit: 'kilometer-per-hour' }); // "50 km/h"
 formatFriendlyNumber(50, { unit: 'kilometer-per-hour', display: 'long' }); // "50 kilometers per hour"
@@ -269,6 +274,7 @@ formatFriendlyNumber(1234.5678, {
   - `'short'`: Compact notation with short display (1.2M), scientific notation for very small numbers (1.2E-4) - for currency: narrow symbol ($), for units: short (km/h)
   - `'long'`: Compact notation with long display (1.2 million) - for currency: full name (US dollars), for units: long (kilometers per hour)
 - `sign`: Show sign for positive/negative numbers - `boolean` (default: `false`, `true` = exceptZero)
+- `absolute`: Show absolute value (removes sign display) - `boolean` (default: `false`)
 - `currency`: Currency code (e.g., `'USD'`, `'EUR'`)
 - `code`: Show currency code instead of symbol - `boolean` (default: `false`, only applies to currency)
 - `accounting`: Use accounting format for negative currency - `boolean` (default: `false`)

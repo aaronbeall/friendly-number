@@ -69,6 +69,21 @@ describe('formatFriendlyNumber', () => {
       expect(formatFriendlyNumber(-42, { sign: true })).toBe('-42');
       expect(formatFriendlyNumber(0, { sign: true })).toBe('0');
     });
+
+    it('should hide sign with absolute flag', () => {
+      expect(formatFriendlyNumber(42, { absolute: true })).toBe('42');
+      expect(formatFriendlyNumber(-42, { absolute: true })).toBe('42');
+      expect(formatFriendlyNumber(0, { absolute: true })).toBe('0');
+    });
+
+    it('should prioritize absolute over sign', () => {
+      expect(formatFriendlyNumber(42, { sign: true, absolute: true })).toBe('42');
+      expect(formatFriendlyNumber(-42, { sign: true, absolute: true })).toBe('42');
+    });
+
+    it('should work with currency and absolute flag', () => {
+      expect(formatFriendlyNumber(-1234, { currency: 'USD', absolute: true })).toBe('$1,234');
+    });
   });
 
   describe('currency', () => {

@@ -49,6 +49,9 @@ export interface FriendlyNumberOptions {
   /** Show sign for positive/negative numbers (true = exceptZero, false = auto) */
   sign?: boolean;
 
+  /** Show absolute value (removes sign display) */
+  absolute?: boolean;
+
   /** Currency code (e.g., 'USD', 'EUR') */
   currency?: string;
 
@@ -177,6 +180,7 @@ export function formatFriendlyNumber(
     locale = 'en-US',
     display,
     sign = false,
+    absolute = false,
     currency,
     code = false,
     accounting = false,
@@ -204,7 +208,11 @@ export function formatFriendlyNumber(
 
   // Set sign display
   if (!format?.signDisplay) {
-    formatOptions.signDisplay = sign ? 'exceptZero' : 'auto';
+    if (absolute) {
+      formatOptions.signDisplay = 'never';
+    } else {
+      formatOptions.signDisplay = sign ? 'exceptZero' : 'auto';
+    }
   }
 
   // Set style (currency, unit, percent, or decimal)
